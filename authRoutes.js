@@ -53,9 +53,9 @@ router.post("/login", async (req, res) => {
     }
 
     // Vytvoříme JWT token
-    const token = jwt.sign({ id: userInfo.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: userInfo.id, firstName: userInfo.firstName, lastName: userInfo.lastName }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    res.json({ accessToken: token });
+    res.json({ accessToken: token, firstName: userInfo.firstName, lastName: userInfo.lastName });
   } catch (err) {
     console.error("Chyba při přihlášení:", err);
     res.status(500).json({ error: "Chyba serveru" });
