@@ -62,4 +62,25 @@ router.post("/login", async (req, res) => {
   }
 });
 
+const verifyToken = require("./verifyToken");
+
+router.get("/userBooks", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  console.log(`Načítám knihy pro uživatele: ${userId}`);
+
+  try {
+    const books = await db.query('SELECT * FROM "user-books" WHERE userid = $1', [userId]);
+    console.log(`Nalezeno ${books.rows.length} knih`);
+
+    if (books.rows.length === 0) {
+      return res.status(404).json({ error: "Žádné knihy nenalezeny." });
+    }
+
+    res.json(books.rows);
+  } catch (err) {
+    console.error("Chyba při získání knih:", err);
+    res.status(500).json({ error: "Chyba serveru" });
+  }
+});
+
 module.exports = router;
