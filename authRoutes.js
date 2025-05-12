@@ -83,4 +83,21 @@ router.get("/userBooks", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/verifyToken", (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ valid: false, error: "Chybí token." });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ valid: true });
+  } catch (err) {
+    res.status(403).json({ valid: false, error: "Neplatný token." });
+  }
+});
+
 module.exports = router;
