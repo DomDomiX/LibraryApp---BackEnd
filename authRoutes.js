@@ -83,6 +83,34 @@ router.get("/userBooks", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/bookSave", verifyToken, async (req, res) => {
+  const { bookId, name, author, isbn } = req.body;
+  const userId = req.user.id;
+
+  if (!bookId || !name || !author || !isbn) {
+    return res.status(400).json({ error: "Chybí některý z údajů (bookId, name, author, isbn)." });
+  }
+
+  try {
+    // Zkontrolujeme, zda uživatel již knihu uložil
+    const existing = await db.query('SELECT * FROM "user-books" WHERE userid = $1 AND bookid = $2', [userId, bookId]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: "Kniha již byla uložena." });
+    }
+
+    // Uložíme knihu do databáze
+    await db.query(
+      'INSERT INTO "user-books" (name, author, isbn, userid, bookid) VALUES ($1, $2, $3, $4, $5)',
+      [name, author, isbn, userId, bookId]
+    );
+
+    res.status(201).json({ message: "Kniha byla úspěšně uložena." });
+  } catch (err) {
+    console.error("Chyba při ukládání knihy:", err);
+    res.status(500).json({ error: "Chyba serveru" });
+  }
+});
+
 router.post("/verifyToken", (req, res) => {
   const authHeader = req.headers.authorization;
 
