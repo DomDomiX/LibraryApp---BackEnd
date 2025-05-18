@@ -111,6 +111,28 @@ router.post("/bookSave", verifyToken, async (req, res) => {
   }
 });
 
+// Endpoint pro odstranění knihy ze seznamu uživatele
+router.delete("/bookRemove/:bookId", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const bookId = req.params.bookId;
+
+  try {
+    const result = await db.query(
+      'DELETE FROM "user-books" WHERE userid = $1 AND bookid = $2 RETURNING *',
+      [userId, bookId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Kniha nebyla nalezena v seznamu uživatele." });
+    }
+
+    res.json({ message: "Kniha byla odebrána ze seznamu." });
+  } catch (err) {
+    console.error("Chyba při odebírání knihy:", err);
+    res.status(500).json({ error: "Chyba serveru" });
+  }
+});
+
 router.post("/verifyToken", (req, res) => {
   const authHeader = req.headers.authorization;
 
