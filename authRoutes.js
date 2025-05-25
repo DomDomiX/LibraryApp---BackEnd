@@ -150,4 +150,9 @@ router.post("/verifyToken", (req, res) => {
   }
 });
 
+router.post("/sendRating", verifyToken, async (req, res) => {
+  const {bookId, bookrating, booklike} = req.body;
+  const userId = req.user.id; 
+});
+
 module.exports = router;
