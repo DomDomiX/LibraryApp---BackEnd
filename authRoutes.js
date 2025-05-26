@@ -151,24 +151,19 @@ router.post("/verifyToken", (req, res) => {
 });
 
 router.post("/sendRating", verifyToken, async (req, res) => {
-  const {bookId, bookrating, booklike} = req.body;
+  const {bookId, bookRating, bookLike} = req.body;
   const userId = req.user.id; 
-
-  // TODO: Dodělat endpoint pro odeslání hodnocení knihy
-  if (!bookId || !bookrating || !booklike) {
-    return res.status(400).json({ error: "Chybí některý z údajů (bookId, bookrating, booklike)." });
-  }
 
   try {
     // Zkontrolujeme, zda uživatel již hodnocení pro knihu uložil
-    const existing = await db.query('SELECT * FROM "book-stats" WHERE userid = $1 AND bookid = $2', [userId, bookId]);
+    const existing = await db.query('SELECT * FROM "books-stats" WHERE userid = $1 AND bookid = $2', [userId, bookId]);
     if (existing.rows.length > 0) {
       return res.status(409).json({ error: "Kniha již byla uložena." });
     }
 
     await db.query(
-        'INSERT INTO "book-stats" (bookid, bookrating, booklike, userid) VALUES ($1, $2, $3, $4)',
-        [bookId, bookrating, booklike, userId]
+        'INSERT INTO "books-stats" (bookid, bookrating, booklike, userid) VALUES ($1, $2, $3, $4)',
+        [bookId, bookRating, bookLike, userId]
       );
 
     res.status(201).json({ message: "Hodnocení knihy bylo úspěšně odesláno." });
