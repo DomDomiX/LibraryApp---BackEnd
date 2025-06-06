@@ -22,6 +22,9 @@ app.use("/api/auth", authRoutes);
 const publicRoutes = require("./publicRoutes");
 app.use("/api", publicRoutes);
 
+const userRoutes = require("./userRoutes");
+app.use("/api/user", userRoutes);
+
 // Testovací endpoint pro kořenovou URL "/"
 // Když někdo navštíví http://localhost:3000/, zobrazí se mu "Ahoj! Server běží."
 app.get('/', (req, res) => {
